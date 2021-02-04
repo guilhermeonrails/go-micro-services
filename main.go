@@ -8,28 +8,27 @@ import (
 )
 
 type Aluno struct {
-	ID     int
-	Codigo string
-	Nome   string
+	ID     int    `json:"id,string"`
+	Codigo string `json:"-"`
+	Nome   string `json:"nome,omitempty"`
 }
 
 func main() {
 	port := 8080
-	http.HandleFunc("/alunos", AlunosHandler)
-	log.Printf("Iniciando Servidor:%v", port)
+
+	http.HandleFunc("/alunos", AlunosHandle)
+
+	log.Printf("Iniciando sevidor na porta %v\n", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
 }
 
-func AlunosHandler(w http.ResponseWriter, r *http.Request) {
+func AlunosHandle(w http.ResponseWriter, r *http.Request) {
 	listaDeAlunos := []Aluno{
 		{1, "001", "Guilherme"},
 		{2, "002", "Ana"},
-		{3, "003", "Maria"},
+		{3, "003", ""},
 		{14, "014", "Bono"},
 	}
-	data, err := json.Marshal(listaDeAlunos)
-	if err != nil {
-		panic("Ops, algo deu errado")
-	}
-	fmt.Fprint(w, string(data))
+	encoder := json.NewEncoder(w)
+	encoder.Encode(&listaDeAlunos)
 }
